@@ -20,17 +20,17 @@ export type Sty = Partial<_Sty>;
 
 // Cutom Element
 export class Miwi_Box extends HTMLElement {
-  parentObserver: MutationObserver;
-  parentAxis: `row` | `column` = `column`; // TODO: Add `stack` option. Probably needs to be a class or something of the sort.
-  parentPadTop: string = `0px`;
-  parentPadRight: string = `0px`;
-  parentPadBottom: string = `0px`;
-  parentPadLeft: string = `0px`;
-  selfObserver: MutationObserver;
-  childrenObserver: MutationObserver;
-  childCount: number = 0;
-  anyChildIsABoxWithAGrowingWidth: boolean = false;
-  anyChildIsABoxWithAGrowingHeight: boolean = false;
+  private _parentObserver: MutationObserver;
+  private _parentAxis: `row` | `column` = `column`; // TODO: Add `stack` option. Probably needs to be a class or something of the sort.
+  private _parentPadTop: string = `0px`;
+  private _parentPadRight: string = `0px`;
+  private _parentPadBottom: string = `0px`;
+  private _parentPadLeft: string = `0px`;
+  private _selfObserver: MutationObserver;
+  private _childrenObserver: MutationObserver;
+  private _childCount: number = 0;
+  private _anyChildIsABoxWithAGrowingWidth: boolean = false;
+  private _anyChildIsABoxWithAGrowingHeight: boolean = false;
 
   static get observedAttributes() {
     return ["sty"];
@@ -50,24 +50,26 @@ export class Miwi_Box extends HTMLElement {
   computeParentStyle() {
     if (exists(this.parentElement)) {
       const computedParentStyle = getComputedStyle(this.parentElement);
-      if (this.parentAxis !== computedParentStyle.flexDirection) {
-        this.parentAxis = computedParentStyle.flexDirection as `row` | `column`;
+      if (this._parentAxis !== computedParentStyle.flexDirection) {
+        this._parentAxis = computedParentStyle.flexDirection as
+          | `row`
+          | `column`;
         this.updateStyle();
       }
-      if (this.parentPadTop !== computedParentStyle.paddingTop) {
-        this.parentPadTop = computedParentStyle.paddingTop;
+      if (this._parentPadTop !== computedParentStyle.paddingTop) {
+        this._parentPadTop = computedParentStyle.paddingTop;
         this.updateStyle();
       }
-      if (this.parentPadRight !== computedParentStyle.paddingRight) {
-        this.parentPadRight = computedParentStyle.paddingRight;
+      if (this._parentPadRight !== computedParentStyle.paddingRight) {
+        this._parentPadRight = computedParentStyle.paddingRight;
         this.updateStyle();
       }
-      if (this.parentPadBottom !== computedParentStyle.paddingBottom) {
-        this.parentPadBottom = computedParentStyle.paddingBottom;
+      if (this._parentPadBottom !== computedParentStyle.paddingBottom) {
+        this._parentPadBottom = computedParentStyle.paddingBottom;
         this.updateStyle();
       }
-      if (this.parentPadLeft !== computedParentStyle.paddingLeft) {
-        this.parentPadLeft = computedParentStyle.paddingLeft;
+      if (this._parentPadLeft !== computedParentStyle.paddingLeft) {
+        this._parentPadLeft = computedParentStyle.paddingLeft;
         this.updateStyle();
       }
     }
@@ -84,8 +86,8 @@ export class Miwi_Box extends HTMLElement {
         ? child.style.width === `100%`
         : false;
     });
-    if (this.anyChildIsABoxWithAGrowingWidth !== childWidthGrows) {
-      this.anyChildIsABoxWithAGrowingWidth = childWidthGrows;
+    if (this._anyChildIsABoxWithAGrowingWidth !== childWidthGrows) {
+      this._anyChildIsABoxWithAGrowingWidth = childWidthGrows;
       this.updateStyle();
     }
     const childHeightGrows = childNodes.some((child) => {
@@ -97,25 +99,24 @@ export class Miwi_Box extends HTMLElement {
         ? computedChildStyle.flexBasis !== "auto"
         : false;
     });
-    if (this.anyChildIsABoxWithAGrowingHeight !== childHeightGrows) {
+    if (this._anyChildIsABoxWithAGrowingHeight !== childHeightGrows) {
       console.log(`We got this far at least once.`);
-      this.anyChildIsABoxWithAGrowingHeight = childHeightGrows;
+      this._anyChildIsABoxWithAGrowingHeight = childHeightGrows;
       this.updateStyle();
     }
   }
 
   updateChildList() {
-    this.childrenObserver.disconnect();
-    // this.childIndexMap.clear();
+    this._childrenObserver.disconnect();
     const childNodes = Array.from(this.childNodes);
-    if (this.childCount !== childNodes.length) {
-      this.childCount = childNodes.length;
+    if (this._childCount !== childNodes.length) {
+      this._childCount = childNodes.length;
       this.updateStyle();
     }
     this.updateChildSizeGrows();
     for (let i = 0; i < childNodes.length; i++) {
       const childNode = childNodes[i];
-      this.childrenObserver.observe(childNode, { attributes: true });
+      this._childrenObserver.observe(childNode, { attributes: true });
     }
   }
 
@@ -125,20 +126,20 @@ export class Miwi_Box extends HTMLElement {
     const newStyle = {
       ...computeBoxSize(
         this.sty,
-        this.anyChildIsABoxWithAGrowingWidth,
-        this.anyChildIsABoxWithAGrowingHeight,
-        this.parentAxis,
-        this.parentPadTop,
-        this.parentPadRight,
-        this.parentPadBottom,
-        this.parentPadLeft,
+        this._anyChildIsABoxWithAGrowingWidth,
+        this._anyChildIsABoxWithAGrowingHeight,
+        this._parentAxis,
+        this._parentPadTop,
+        this._parentPadRight,
+        this._parentPadBottom,
+        this._parentPadLeft,
       ),
       ...computeBoxLayout(
         this.sty,
         align,
-        this.parentAxis,
+        this._parentAxis,
         this._axis,
-        this.childCount,
+        this._childCount,
       ),
       ...computeBoxDecoration(this.sty),
       ...computeTextStyle(
@@ -158,7 +159,7 @@ export class Miwi_Box extends HTMLElement {
 
   constructor() {
     super();
-    this.parentObserver = new MutationObserver((mutationsList, observer) => {
+    this._parentObserver = new MutationObserver((mutationsList, observer) => {
       for (let mutation of mutationsList) {
         if (
           mutation.type === "attributes" &&
@@ -169,7 +170,7 @@ export class Miwi_Box extends HTMLElement {
       }
     });
 
-    this.childrenObserver = new MutationObserver((mutationsList, observer) => {
+    this._childrenObserver = new MutationObserver((mutationsList, observer) => {
       for (let mutation of mutationsList) {
         if (
           mutation.type === "attributes" &&
@@ -181,7 +182,7 @@ export class Miwi_Box extends HTMLElement {
       }
     });
 
-    this.selfObserver = new MutationObserver((mutationsList, observer) => {
+    this._selfObserver = new MutationObserver((mutationsList, observer) => {
       for (let mutation of mutationsList) {
         if (mutation.type === "childList") {
           this.updateChildList();
@@ -195,18 +196,18 @@ export class Miwi_Box extends HTMLElement {
     this.updateChildList();
     this.updateStyle();
 
-    this.selfObserver.observe(this, { childList: true });
+    this._selfObserver.observe(this, { childList: true });
 
     if (exists(this.parentElement)) {
-      this.parentObserver.observe(this.parentElement, { attributes: true });
+      this._parentObserver.observe(this.parentElement, { attributes: true });
     }
   }
 
   disconnectedCallback() {
-    this.parentObserver.disconnect();
-    this.selfObserver.disconnect();
-    this.childrenObserver.disconnect();
-    this.childCount = 0;
+    this._parentObserver.disconnect();
+    this._selfObserver.disconnect();
+    this._childrenObserver.disconnect();
+    this._childCount = 0;
   }
 }
 customElements.define("b-x", Miwi_Box);

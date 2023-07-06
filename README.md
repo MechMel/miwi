@@ -1,6 +1,6 @@
 # Miwi
 
-This package is the beginnings of a full-stack, cross-framework meta-framework. It's my attempt to build an app development api the way I think it should work. It is essentially in pre-alpha. Feel free to experiment, but don't rely on it at all yet. It will change drastically in the coming months.
+This package is the beginnings of a full-stack, cross-framework meta-framework. It's my attempt to build an app development system the way I think it should work. It is essentially in pre-alpha. Feel free to experiment, but don't rely on it at all yet. It will change drastically in the coming months.
 
 ## miwi/b-x
 

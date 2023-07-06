@@ -70,21 +70,23 @@ export function computeBoxDecoration(sty: Partial<DecorationSty>): CssProps {
     outlineOffset: exists(sty.outlineSize)
       ? `-${sizeToCss(sty.outlineSize)}`
       : undefined,
-    backgroundColor: sty.background?.startsWith(`data:image`)
-      ? undefined
-      : sty.background,
-    backgroundImage: sty.background?.startsWith(`data:image`)
-      ? `url('${sty.background}')`
-      : undefined,
+    backgroundColor:
+      sty.background?.startsWith(`data:image`) ||
+      sty.background?.startsWith(`/`)
+        ? undefined
+        : sty.background,
+    backgroundImage:
+      sty.background?.startsWith(`data:image`) ||
+      sty.background?.startsWith(`/`)
+        ? `url('${sty.background}')`
+        : undefined,
     backgroundSize: `cover`,
+    backgroundPosition: `center`,
     // Add background images
     boxShadow: exists(sty.shadowSize)
       ? `${sizeToCss(0.09 * sty.shadowSize * shadowDirection.x)} ${sizeToCss(
           -0.09 * sty.shadowSize * shadowDirection.y,
-        )} ${sizeToCss(0.4 * sty.shadowSize)} 0 ${mdColors.grey.substring(
-          0,
-          7,
-        )}cc`
+        )} ${sizeToCss(0.4 * sty.shadowSize)} 0 #00000045`
       : undefined,
     zIndex: sty.zIndex,
   };

@@ -54,16 +54,19 @@ function computeBoxDecoration(sty) {
         outlineOffset: (0, BoxUtils_1.exists)(sty.outlineSize)
             ? `-${(0, BoxSize_1.sizeToCss)(sty.outlineSize)}`
             : undefined,
-        backgroundColor: sty.background?.startsWith(`data:image`)
+        backgroundColor: sty.background?.startsWith(`data:image`) ||
+            sty.background?.startsWith(`/`)
             ? undefined
             : sty.background,
-        backgroundImage: sty.background?.startsWith(`data:image`)
+        backgroundImage: sty.background?.startsWith(`data:image`) ||
+            sty.background?.startsWith(`/`)
             ? `url('${sty.background}')`
             : undefined,
         backgroundSize: `cover`,
+        backgroundPosition: `center`,
         // Add background images
         boxShadow: (0, BoxUtils_1.exists)(sty.shadowSize)
-            ? `${(0, BoxSize_1.sizeToCss)(0.09 * sty.shadowSize * shadowDirection.x)} ${(0, BoxSize_1.sizeToCss)(-0.09 * sty.shadowSize * shadowDirection.y)} ${(0, BoxSize_1.sizeToCss)(0.4 * sty.shadowSize)} 0 ${exports.mdColors.grey.substring(0, 7)}cc`
+            ? `${(0, BoxSize_1.sizeToCss)(0.09 * sty.shadowSize * shadowDirection.x)} ${(0, BoxSize_1.sizeToCss)(-0.09 * sty.shadowSize * shadowDirection.y)} ${(0, BoxSize_1.sizeToCss)(0.4 * sty.shadowSize)} 0 #00000045`
             : undefined,
         zIndex: sty.zIndex,
     };

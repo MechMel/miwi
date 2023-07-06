@@ -9,17 +9,17 @@ const BoxText_1 = require("./BoxText");
 const BoxInteraction_1 = require("./BoxInteraction");
 // Cutom Element
 class Miwi_Box extends HTMLElement {
-    parentObserver;
-    parentAxis = `column`; // TODO: Add `stack` option. Probably needs to be a class or something of the sort.
-    parentPadTop = `0px`;
-    parentPadRight = `0px`;
-    parentPadBottom = `0px`;
-    parentPadLeft = `0px`;
-    selfObserver;
-    childrenObserver;
-    childCount = 0;
-    anyChildIsABoxWithAGrowingWidth = false;
-    anyChildIsABoxWithAGrowingHeight = false;
+    _parentObserver;
+    _parentAxis = `column`; // TODO: Add `stack` option. Probably needs to be a class or something of the sort.
+    _parentPadTop = `0px`;
+    _parentPadRight = `0px`;
+    _parentPadBottom = `0px`;
+    _parentPadLeft = `0px`;
+    _selfObserver;
+    _childrenObserver;
+    _childCount = 0;
+    _anyChildIsABoxWithAGrowingWidth = false;
+    _anyChildIsABoxWithAGrowingHeight = false;
     static get observedAttributes() {
         return ["sty"];
     }
@@ -36,24 +36,24 @@ class Miwi_Box extends HTMLElement {
     computeParentStyle() {
         if ((0, BoxUtils_1.exists)(this.parentElement)) {
             const computedParentStyle = getComputedStyle(this.parentElement);
-            if (this.parentAxis !== computedParentStyle.flexDirection) {
-                this.parentAxis = computedParentStyle.flexDirection;
+            if (this._parentAxis !== computedParentStyle.flexDirection) {
+                this._parentAxis = computedParentStyle.flexDirection;
                 this.updateStyle();
             }
-            if (this.parentPadTop !== computedParentStyle.paddingTop) {
-                this.parentPadTop = computedParentStyle.paddingTop;
+            if (this._parentPadTop !== computedParentStyle.paddingTop) {
+                this._parentPadTop = computedParentStyle.paddingTop;
                 this.updateStyle();
             }
-            if (this.parentPadRight !== computedParentStyle.paddingRight) {
-                this.parentPadRight = computedParentStyle.paddingRight;
+            if (this._parentPadRight !== computedParentStyle.paddingRight) {
+                this._parentPadRight = computedParentStyle.paddingRight;
                 this.updateStyle();
             }
-            if (this.parentPadBottom !== computedParentStyle.paddingBottom) {
-                this.parentPadBottom = computedParentStyle.paddingBottom;
+            if (this._parentPadBottom !== computedParentStyle.paddingBottom) {
+                this._parentPadBottom = computedParentStyle.paddingBottom;
                 this.updateStyle();
             }
-            if (this.parentPadLeft !== computedParentStyle.paddingLeft) {
-                this.parentPadLeft = computedParentStyle.paddingLeft;
+            if (this._parentPadLeft !== computedParentStyle.paddingLeft) {
+                this._parentPadLeft = computedParentStyle.paddingLeft;
                 this.updateStyle();
             }
         }
@@ -70,8 +70,8 @@ class Miwi_Box extends HTMLElement {
                     ? child.style.width === `100%`
                     : false;
         });
-        if (this.anyChildIsABoxWithAGrowingWidth !== childWidthGrows) {
-            this.anyChildIsABoxWithAGrowingWidth = childWidthGrows;
+        if (this._anyChildIsABoxWithAGrowingWidth !== childWidthGrows) {
+            this._anyChildIsABoxWithAGrowingWidth = childWidthGrows;
             this.updateStyle();
         }
         const childHeightGrows = childNodes.some((child) => {
@@ -84,31 +84,30 @@ class Miwi_Box extends HTMLElement {
                     ? computedChildStyle.flexBasis !== "auto"
                     : false;
         });
-        if (this.anyChildIsABoxWithAGrowingHeight !== childHeightGrows) {
+        if (this._anyChildIsABoxWithAGrowingHeight !== childHeightGrows) {
             console.log(`We got this far at least once.`);
-            this.anyChildIsABoxWithAGrowingHeight = childHeightGrows;
+            this._anyChildIsABoxWithAGrowingHeight = childHeightGrows;
             this.updateStyle();
         }
     }
     updateChildList() {
-        this.childrenObserver.disconnect();
-        // this.childIndexMap.clear();
+        this._childrenObserver.disconnect();
         const childNodes = Array.from(this.childNodes);
-        if (this.childCount !== childNodes.length) {
-            this.childCount = childNodes.length;
+        if (this._childCount !== childNodes.length) {
+            this._childCount = childNodes.length;
             this.updateStyle();
         }
         this.updateChildSizeGrows();
         for (let i = 0; i < childNodes.length; i++) {
             const childNode = childNodes[i];
-            this.childrenObserver.observe(childNode, { attributes: true });
+            this._childrenObserver.observe(childNode, { attributes: true });
         }
     }
     updateStyle() {
         const align = this.sty.align ?? BoxLayout_1.Align.center;
         const newStyle = {
-            ...(0, BoxSize_1.computeBoxSize)(this.sty, this.anyChildIsABoxWithAGrowingWidth, this.anyChildIsABoxWithAGrowingHeight, this.parentAxis, this.parentPadTop, this.parentPadRight, this.parentPadBottom, this.parentPadLeft),
-            ...(0, BoxLayout_1.computeBoxLayout)(this.sty, align, this.parentAxis, this._axis, this.childCount),
+            ...(0, BoxSize_1.computeBoxSize)(this.sty, this._anyChildIsABoxWithAGrowingWidth, this._anyChildIsABoxWithAGrowingHeight, this._parentAxis, this._parentPadTop, this._parentPadRight, this._parentPadBottom, this._parentPadLeft),
+            ...(0, BoxLayout_1.computeBoxLayout)(this.sty, align, this._parentAxis, this._axis, this._childCount),
             ...(0, BoxDecoration_1.computeBoxDecoration)(this.sty),
             ...(0, BoxText_1.computeTextStyle)(this.sty, (0, BoxUtils_1.isString)(align) ? align : align.alignX, this.sty.overflowX ?? BoxLayout_1.defaultOverflowX),
             ...(0, BoxInteraction_1.computeBoxInteraction)(this.sty),
@@ -121,7 +120,7 @@ class Miwi_Box extends HTMLElement {
     }
     constructor() {
         super();
-        this.parentObserver = new MutationObserver((mutationsList, observer) => {
+        this._parentObserver = new MutationObserver((mutationsList, observer) => {
             for (let mutation of mutationsList) {
                 if (mutation.type === "attributes" &&
                     mutation.attributeName === "style") {
@@ -129,7 +128,7 @@ class Miwi_Box extends HTMLElement {
                 }
             }
         });
-        this.childrenObserver = new MutationObserver((mutationsList, observer) => {
+        this._childrenObserver = new MutationObserver((mutationsList, observer) => {
             for (let mutation of mutationsList) {
                 if (mutation.type === "attributes" &&
                     mutation.attributeName === "style" &&
@@ -138,7 +137,7 @@ class Miwi_Box extends HTMLElement {
                 }
             }
         });
-        this.selfObserver = new MutationObserver((mutationsList, observer) => {
+        this._selfObserver = new MutationObserver((mutationsList, observer) => {
             for (let mutation of mutationsList) {
                 if (mutation.type === "childList") {
                     this.updateChildList();
@@ -150,16 +149,16 @@ class Miwi_Box extends HTMLElement {
         this.computeParentStyle();
         this.updateChildList();
         this.updateStyle();
-        this.selfObserver.observe(this, { childList: true });
+        this._selfObserver.observe(this, { childList: true });
         if ((0, BoxUtils_1.exists)(this.parentElement)) {
-            this.parentObserver.observe(this.parentElement, { attributes: true });
+            this._parentObserver.observe(this.parentElement, { attributes: true });
         }
     }
     disconnectedCallback() {
-        this.parentObserver.disconnect();
-        this.selfObserver.disconnect();
-        this.childrenObserver.disconnect();
-        this.childCount = 0;
+        this._parentObserver.disconnect();
+        this._selfObserver.disconnect();
+        this._childrenObserver.disconnect();
+        this._childCount = 0;
     }
 }
 exports.Miwi_Box = Miwi_Box;

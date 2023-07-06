@@ -15,6 +15,7 @@
   "exports": {
     ".": "./dist/index.js",
     "./ui": "./dist/ui/index.js",
-    "./orm": "./dist/orm/index.js"
+    "./orm": "./dist/orm/index.js",
+    "./b-x": "./dist/b-x/index.js"
   }
 }

@@ -7,6 +7,6 @@
     "strict": true,
     "esModuleInterop": true
   },
-  "include": ["ui/**/*.ts", "orm/**/*.ts"],
+  "include": ["ui/**/*.ts", "orm/**/*.ts", "b-x/**/*.ts"],
   "exclude": ["node_modules"]
 }

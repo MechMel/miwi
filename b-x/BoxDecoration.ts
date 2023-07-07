@@ -82,6 +82,7 @@ export function computeBoxDecoration(sty: Partial<DecorationSty>): CssProps {
         : undefined,
     backgroundSize: `cover`,
     backgroundPosition: `center`,
+    backgroundRepeat: `no-repeat`,
     // Add background images
     boxShadow: exists(sty.shadowSize)
       ? `${sizeToCss(0.09 * sty.shadowSize * shadowDirection.x)} ${sizeToCss(
